@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <record id="budget_analytic_view_form" model="ir.ui.view">
+            <field name="name">budget.analytic.view.form</field>
+            <field name="model">budget.analytic</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button string="Reset to Draft" name="action_budget_draft" invisible="state == 'draft'" type="object" class="btn-primary"/>
+                        <button string="Open" name="action_budget_confirm" invisible="state != 'draft'" type="object" class="btn-primary"/>
+                        <button string="Done" name="action_budget_done" invisible="state != 'confirm'" type="object" class="btn-secondary"/>
+                        <button string="Cancel Budget" name="action_budget_cancel" invisible="state != 'draft'" type="object" class="btn-secondary"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_budget_report" type="object" string="Budget Breakdown" class="oe_stat_button" icon="fa-bar-chart" invisible="state == 'draft'"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" readonly="state != 'draft'" placeholder="e.g. Budget 2024"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="user_id" domain="[('share', '=', False)]" widget="many2one_avatar" options="{'no_create': True}" readonly="state != 'draft'"/>
+                                <field name="budget_type" readonly="state != 'draft'"/>
+                                <field name="project_account_id" readonly="state != 'draft'" string="Project"/>
+                            </group>
+                            <group>
+                                <label for="date_from" string="Period"/>
+                                <div class="o_row">
+                                    <field name="date_from" nolabel="1" class="oe_inline" readonly="state != 'draft'"/>
+                                    <i class="fa fa-long-arrow-right mx-2" aria-label="to" title="to"/>
+                                    <field name="date_to" nolabel="1" class="oe_inline" readonly="state != 'draft'"/>
+                                </div>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True, 'no_open': True}" readonly="state != 'draft'"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Budget Lines">
+                                <field name="line_ids" colspan="4" nolabel="1">
+                                    <list string="Budget Lines" editable="bottom" decoration-bf="achieved_percentage >= 100.0" decoration-danger="budget_type == 'expense' and achieved_percentage >= 100.0" decoration-warning="budget_type == 'expense' and achieved_percentage >= 80.0" decoration-success="budget_type == 'revenue' and achieved_percentage >= 100.0">
+                                        <field name="currency_id" column_invisible="1"/>
+                                        <field name="budget_id" column_invisible="1"/>
+                                        <field name="budget_type" column_invisible="1"/>
+                                        <field name="budget_state" column_invisible="1"/>
+                                        <field name="account_id" optional="show" readonly="budget_state != 'draft'"/>
+                                        <field name="budget_amount" widget="monetary" readonly="budget_state != 'draft'" sum="1"/>
+                                        <field name="forecast_amount" widget="monetary" optional="hide" sum="1"/>
+                                        <field name="committed_amount" widget="monetary" optional="hide" sum="1"/>
+                                        <field name="committed_percentage" optional="hide"/>
+                                        <field name="achieved_amount" widget="monetary" sum="1"/>
+                                        <field name="achieved_percentage" optional="hide"/>
+                                        <field name="remaining_amount" widget="monetary" optional="hide" sum="1"/>
+                                        <field name="theoretical_amount" widget="monetary" optional="hide" sum="1"/>
+                                        <field name="theoretical_percentage" optional="hide"/>
+                                        <button name="action_budget_report" type="object" string="Details" class="oe_stat_button" icon="fa-bar-chart" invisible="budget_state == 'draft'"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="budget_analytic_view_tree" model="ir.ui.view">
+            <field name="name">budget.analytic.view.tree</field>
+            <field name="model">budget.analytic</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="budget_type"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="state" />
+                </list>
+            </field>
+        </record>
+
+        <record id="budget_analytic_action" model="ir.actions.act_window">
+            <field name="name">Budgets</field>
+            <field name="res_model">budget.analytic</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem id="menu_budget_analytics" parent="account.menu_finance_entries" name="Budgets" action="budget_analytic_action" sequence="60" groups="account.group_account_user" />
+
+        <!-- Form view for budget.analytic.report -->
+        <record id="budget_analytic_report_view_form" model="ir.ui.view">
+            <field name="name">budget.analytic.report.view.form</field>
+            <field name="model">budget.analytic.report</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="date"/>
+                                <field name="description"/>
+                                <field name="account_id"/>
+                                <field name="line_type"/>
+                                <field name="category"/>
+                            </group>
+                            <group>
+                                <field name="budget"/>
+                                <field name="committed"/>
+                                <field name="actual"/>
+                                <field name="currency_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree view for budget.analytic.report -->
+        <record id="budget_analytic_report_view_tree" model="ir.ui.view">
+            <field name="name">budget.analytic.report.view.tree</field>
+            <field name="model">budget.analytic.report</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="date"/>
+                    <field name="description"/>
+                    <field name="account_id"/>
+                    <field name="line_type"/>
+                    <field name="category"/>
+                    <field name="res_model" column_invisible="1"/>
+                    <field name="res_id" column_invisible="1"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="budget" sum="Total Budget"/>
+                    <field name="committed" sum="Total Committed"/>
+                    <field name="actual" sum="Total Actual"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Action for budget.analytic.report -->
+        <record id="budget_analytic_report_action" model="ir.actions.act_window">
+            <field name="name">Budget Reports</field>
+            <field name="res_model">budget.analytic.report</field>
+            <field name="view_mode">list,form,pivot</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem id="menu_budget_analytic_reports" parent="account.menu_finance_entries" name="Budget Analytic Items" action="budget_analytic_report_action" sequence="61" groups="account.group_account_readonly,account.group_account_invoice" />
+
+    </data>
+
+</odoo>

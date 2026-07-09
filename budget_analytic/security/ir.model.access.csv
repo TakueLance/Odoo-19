@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_budget_analytic,budget.analytic,model_budget_analytic,account.group_account_manager,1,1,1,1
+access_budget_analytic_line,budget.analytic.line,model_budget_analytic_line,account.group_account_manager,1,1,1,1
+access_budget_analytic_report,budget.analytic.report,model_budget_analytic_report,,1,1,1,1
