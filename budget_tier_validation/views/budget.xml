@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="budget_analytic_list" model="ir.ui.view">
+            <field name="name">budget.analytic.view.list.inherit.tier.validation</field>
+            <field name="model">budget.analytic</field>
+            <field name="inherit_id" ref="budget_analytic.budget_analytic_view_tree" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field
+                        name="validation_status"
+                        widget="badge"
+                        optional="hide"
+                        decoration-info="validation_status == 'pending'"
+                        decoration-danger="validation_status == 'rejected'"
+                        decoration-success="validation_status == 'validated'"
+                    />
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
